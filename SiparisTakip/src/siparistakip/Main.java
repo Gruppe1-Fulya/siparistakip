@@ -21,7 +21,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.paint.Color;
 import javafx.scene.Node;
-// Değişiklik
+// A
 public class Main extends Application {
     @FXML
     Button menubtn;

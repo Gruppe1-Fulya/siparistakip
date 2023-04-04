@@ -21,7 +21,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.paint.Color;
 import javafx.scene.Node;
-// A
+
 public class Main extends Application {
     @FXML
     Button menubtn;
@@ -33,6 +33,8 @@ public class Main extends Application {
     Button sipariskaydetbtn;
     @FXML
     Button odemebtn;
+    @FXML
+    Button odemetamamlabtn;
     @FXML
     Button girisbtn;
     @FXML
@@ -202,9 +204,9 @@ public class Main extends Application {
         fislerbtn.setOnAction(new EventHandler<ActionEvent>() {
             public void handle(ActionEvent e) {
                 ObservableList<FisTablo> girdiler = fistablo.getItems();
-                FisTablo girdi = new FisTablo("A-09", 35, 356.65, 3.35, 360.00, "PayPal", new Date(System.currentTimeMillis()), "yasin", "bahşiş düşük");
+                FisTablo girdi = new FisTablo("A-09", 35, 356.65, 3.35, 360.00, "PayPal", new Date(System.currentTimeMillis()), "yasin", "");
                 girdiler.add(girdi);
-                girdi = new FisTablo("A-15", 41, 376.65, 3.35, 380.00, "Netflix Hediye Kartı", new Date(System.currentTimeMillis()+1000*60*60*24), "kerem", "netflix ile ödeme alan ilk yerli ve milli şirket");
+                girdi = new FisTablo("A-15", 41, 376.65, 3.35, 380.00, "Netflix Hediye Kartı", new Date(System.currentTimeMillis()+1000*60*60*24), "kerem", "Hizmet Güzeldi");
                 girdiler.add(girdi);
                 fistablo.setItems(girdiler);
             	masalarpane.setVisible(false);
@@ -233,6 +235,12 @@ public class Main extends Application {
             public void handle(ActionEvent e){
             	siparispane.setVisible(false);
             	odemepane.setVisible(true);
+            }
+        });
+        odemetamamlabtn.setOnAction(new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent e){
+            	odemepane.setVisible(false);
+            	masalarpane.setVisible(true);
             }
         });
     }

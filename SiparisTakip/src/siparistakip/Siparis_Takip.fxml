@@ -39,6 +39,8 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Circle?>
@@ -799,12 +801,12 @@
                   </AnchorPane>
                   <AnchorPane fx:id="girispane" prefHeight="720.0" prefWidth="1280.0">
                      <children>
-                        <Text layoutX="380.0" layoutY="362.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Lütfen şifrenizi girin: ">
-                           <font>
-                              <Font size="16.0" />
-                           </font>
-                        </Text>
-                        <Text fx:id="giristxt" layoutX="594.0" layoutY="418.0" strokeType="OUTSIDE" strokeWidth="0.0" text=" ">
+                        <ImageView fx:id="girisfoto" fitHeight="720.0" fitWidth="1280.0" pickOnBounds="true">
+                           <image>
+                              <Image url="@arkaplan.jpg" />
+                           </image>
+                        </ImageView>
+                        <Text fill="WHITE" layoutX="380.0" layoutY="362.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Lütfen şifrenizi girin: ">
                            <font>
                               <Font size="16.0" />
                            </font>
@@ -819,7 +821,12 @@
                               <Font size="16.0" />
                            </font>
                         </PasswordField>
-                        <Text layoutX="601.0" layoutY="306.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Hoşgeldiniz! ">
+                        <Text fx:id="giristxt" fill="RED" layoutX="582.0" layoutY="412.0" stroke="WHITE" strokeLineCap="ROUND" strokeLineJoin="ROUND" strokeType="OUTSIDE" strokeWidth="0.4" textAlignment="CENTER">
+                           <font>
+                              <Font size="20.0" />
+                           </font>
+                        </Text>
+                        <Text fill="WHITE" layoutX="601.0" layoutY="306.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Hoşgeldiniz! ">
                            <font>
                               <Font size="16.0" />
                            </font>

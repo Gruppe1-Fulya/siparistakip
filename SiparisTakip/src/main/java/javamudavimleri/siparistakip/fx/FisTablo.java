@@ -1,4 +1,4 @@
-package siparistakip;
+package javamudavimleri.siparistakip.fx;
 
 import java.util.Date;
 

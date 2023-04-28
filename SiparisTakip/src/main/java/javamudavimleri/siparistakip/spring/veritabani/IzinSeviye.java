@@ -13,15 +13,23 @@ public class IzinSeviye {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 	private String izinSeviyeAdi;
+	private int izinSeviyesi;
 	public IzinSeviye() {}
-	public IzinSeviye(String izinSeviyeAdi) {
+	public IzinSeviye(String izinSeviyeAdi, int izinSeviyesi) {
 		this.setIzinSeviyeAdi(izinSeviyeAdi);
+		this.setIzinSeviyesi(izinSeviyesi);
 	}
 	public String getIzinSeviyeAdi() {
 		return izinSeviyeAdi;
 	}
 	public void setIzinSeviyeAdi(String izinSeviyeAdi) {
 		this.izinSeviyeAdi = izinSeviyeAdi;
+	}
+	public int getIzinSeviyesi() {
+		return izinSeviyesi;
+	}
+	public void setIzinSeviyesi(int izinSeviyesi) {
+		this.izinSeviyesi = izinSeviyesi;
 	}
 	public Long getId() {
 		return id;

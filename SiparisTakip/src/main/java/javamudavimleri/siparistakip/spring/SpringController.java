@@ -52,10 +52,12 @@ public class SpringController {
 	@PostMapping("/izinSeviyeEkle")
     @ResponseBody
     public ResponseEntity<String> izinSeviyeEkle(@RequestParam(name = "masterKey")String masterKey
-    							, @RequestParam(name = "izinSeviyeAdi")String izinSeviyeAdi){
+    							, @RequestParam(name = "izinSeviyeAdi")String izinSeviyeAdi
+    							, @RequestParam(name = "izinSeviyesi")String izinSeviyesi){
 		try {
 			masterKey = URLDecoder.decode(masterKey, "UTF-8");
 			izinSeviyeAdi = URLDecoder.decode(izinSeviyeAdi, "UTF-8");
+			izinSeviyesi = URLDecoder.decode(izinSeviyesi, "UTF-8");
 		}
 		catch(Exception e) {
 			e.printStackTrace();
@@ -66,7 +68,7 @@ public class SpringController {
 			if(izinseviyedb.findByIzinSeviyeAdi(izinSeviyeAdi)!=null) {
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Zaten var! ");
 			}
-			izinseviyedb.save(new IzinSeviye(izinSeviyeAdi));
+			izinseviyedb.save(new IzinSeviye(izinSeviyeAdi, Integer.parseInt(izinSeviyesi)));
 			return ResponseEntity.status(HttpStatus.OK).body("İşlem tamamlandı! ");
 		}
 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Erişim izniniz yok! ");
@@ -156,6 +158,10 @@ public class SpringController {
     	if(girisYapan==null) {
     		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Erişim izniniz yok! ");
     	}
+    	if(izinseviyedb.findById(girisYapan.getIzinSeviyeID()).get().getIzinSeviyesi() 
+    			< izinseviyedb.findByIzinSeviyeAdi("Kasiyer").getIzinSeviyesi()) {
+    		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Erişim izniniz yok! ");
+    	}
     	if(urunturudb.findById(Long.parseLong(urunTuruID))==null) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Ürun türü bulunamadı! ");
 		}
@@ -180,6 +186,10 @@ public class SpringController {
 		
 		Personel girisYapan = personeldb.findByPersonelSifreHashed(sifreHashed);
     	if(girisYapan==null) {
+    		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Erişim izniniz yok! ");
+    	}
+    	if(izinseviyedb.findById(girisYapan.getIzinSeviyeID()).get().getIzinSeviyesi() 
+    			< izinseviyedb.findByIzinSeviyeAdi("Kasiyer").getIzinSeviyesi()) {
     		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Erişim izniniz yok! ");
     	}
     	if(urundb.findById(Long.parseLong(urunID))==null) {

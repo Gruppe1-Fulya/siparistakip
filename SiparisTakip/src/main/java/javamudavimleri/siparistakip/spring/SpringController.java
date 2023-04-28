@@ -13,12 +13,28 @@ import javamudavimleri.siparistakip.spring.veritabani.*;
 
 @Controller
 public class SpringController {
+	private String masterKey = "JavaMudavimleri";
+	
+	@Autowired
+    private UrunTuruDB urunturudb;
 	@Autowired
     private PersonelDB personeldb;
 	@Autowired
     private IzinSeviyeDB izinseviyedb;
-	private String masterKey = "JavaMudavimleri";
 	
+	@PostMapping("/urunTuruEkle")
+    @ResponseBody
+    public ResponseEntity<String> urunTuruEkle(@RequestParam(name = "masterKey")String masterKey
+    							, @RequestParam(name = "urunTuruAdi")String urunTuruAdi){
+		if(masterKey.equals(this.masterKey)) {
+			if(urunturudb.findByUrunTuruAdi(urunTuruAdi)!=null) {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Zaten var! ");
+			}
+			urunturudb.save(new UrunTuru(urunTuruAdi));
+			return ResponseEntity.status(HttpStatus.OK).body("İşlem tamamlandı! ");
+		}
+		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Erişim izniniz yok! ");
+    }
 	@PostMapping("/izinSeviyeEkle")
     @ResponseBody
     public ResponseEntity<String> izinSeviyeEkle(@RequestParam(name = "masterKey")String masterKey

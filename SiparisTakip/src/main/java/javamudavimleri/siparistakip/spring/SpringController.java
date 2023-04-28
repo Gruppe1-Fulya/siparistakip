@@ -165,6 +165,29 @@ public class SpringController {
     	urundb.save(new Urun(urunAdi, Double.parseDouble(urunFiyati), Long.parseLong(urunTuruID)));
     	return ResponseEntity.status(HttpStatus.OK).body("İşlem tamamlandı! ");
     }
+	@PostMapping("/urunCikar")
+    @ResponseBody
+    public ResponseEntity<String> urunCikar(@RequestParam(name = "sifreHashed")String sifreHashed
+    							, @RequestParam(name = "urunID")String urunID){
+		try {
+			sifreHashed = URLDecoder.decode(sifreHashed, "UTF-8");
+			urunID = URLDecoder.decode(urunID, "UTF-8");
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Parametreler hatalı! ");
+		}
+		
+		Personel girisYapan = personeldb.findByPersonelSifreHashed(sifreHashed);
+    	if(girisYapan==null) {
+    		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Erişim izniniz yok! ");
+    	}
+    	if(urundb.findById(Long.parseLong(urunID))==null) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Ürun bulunamadı! ");
+		}
+    	urundb.deleteById(Long.parseLong(urunID));
+    	return ResponseEntity.status(HttpStatus.OK).body("İşlem tamamlandı! ");
+    }
 	@GetMapping("/urunler")
     @ResponseBody
     public ResponseEntity<List<Urun>> urunler(@RequestParam(name = "sifreHashed")String sifreHashed

@@ -45,6 +45,17 @@ public class Istek {
 		}
 		return istekJSONObject("bos", "GET", true);
 	}
+	public JSONObject urunCikar(String sifreHashed, String urunID) {
+		try {
+			return istekJSONObject("urunCikar?sifreHashed="+URLEncoder.encode(sifreHashed, "UTF-8")
+					+"&urunID="+URLEncoder.encode(urunID, "UTF-8"), "POST", true);
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+			
+		}
+		return istekJSONObject("bos", "GET", true);
+	}
 	public JSONArray urunler(String sifreHashed, Long urunTuruID) {
 		try {
 			return istekJSONArray("urunler?sifreHashed="+URLEncoder.encode(sifreHashed, "UTF-8")

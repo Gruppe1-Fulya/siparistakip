@@ -213,16 +213,45 @@ public class Kontrolcu implements Initializable{
 				
 			}
         };
-        menukdevent = new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent arg0) {
-				
-			}
-        };
         menukcevent = new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent arg0) {
-				
+				try {
+					AnchorPane menukcitem = (AnchorPane)((Node)(arg0.getSource())).getParent();
+					if(istek.urunCikar(girisYapan.getString("personelSifreHashed"), menukcitem.getId().substring(5)).getInt("yanitKodu")==HttpStatus.OK.value()) {
+						if(urunTuruIsimleri.get(menukcombo.getValue()) != null) {
+							mkihguncelle(urunTuruIsimleri.get(menukcombo.getValue()));
+						}
+					}
+				}
+				catch(Exception e) {
+					e.printStackTrace();
+				}
+			}
+        };
+        menukdevent = new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent arg0) {
+				try {
+					AnchorPane menukditem = (AnchorPane)((Node)(arg0.getSource())).getParent();
+					TextField menukditemadi = (TextField)menukditem.lookup("#"+menukditem.getId()+"a");
+					TextField menukditemfiyati = (TextField)menukditem.lookup("#"+menukditem.getId()+"d");
+					if(istek.urunCikar(girisYapan.getString("personelSifreHashed")
+							, menukditem.getId().substring(5)).getInt("yanitKodu") == HttpStatus.OK.value()) {
+						istek.urunEkle(girisYapan.getString("personelSifreHashed")
+								, menukditemadi.getText()
+								, Double.parseDouble(menukditemfiyati.getText())
+								, urunTuruIsimleri.get(menukcombo.getValue()));
+						menuurunfiyattxtf.setText("");
+						menuurunaditxtf.setText("");
+						if(urunTuruIsimleri.get(menukcombo.getValue()) != null) {
+							mkihguncelle(urunTuruIsimleri.get(menukcombo.getValue()));
+						}
+					}
+				}
+				catch(Exception e) {
+					e.printStackTrace();
+				}
 			}
         };
         sipariskeevent = new EventHandler<ActionEvent>() {
@@ -245,7 +274,6 @@ public class Kontrolcu implements Initializable{
 				}
 			}
         };
-        
         menuuruneklebtn.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent arg0) {

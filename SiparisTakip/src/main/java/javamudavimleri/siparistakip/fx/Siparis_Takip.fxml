@@ -604,17 +604,17 @@
                               <AnchorPane layoutY="260.0" prefHeight="60.0" prefWidth="640.0">
                                  <children>
                                     <Text layoutX="24.0" layoutY="35.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Ürün Adı :" />
-                                    <TextField layoutX="157.0" layoutY="17.0" text=" " />
+                                    <TextField fx:id="menuurunaditxtf" layoutX="157.0" layoutY="17.0" text=" " />
                                  </children>
                               </AnchorPane>
                               <AnchorPane layoutY="320.0" prefHeight="60.0" prefWidth="640.0">
                                  <children>
                                     <Text layoutX="24.0" layoutY="35.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Birim Fiyatı :" />
-                                    <TextField layoutX="157.0" layoutY="17.0" text=" " />
+                                    <TextField fx:id="menuurunfiyattxtf" layoutX="157.0" layoutY="17.0" text=" " />
                                     <Text layoutX="320.0" layoutY="43.0" strokeType="OUTSIDE" strokeWidth="0.0" text=" ₺" />
                                  </children>
                               </AnchorPane>
-                              <Button layoutX="348.0" layoutY="380.0" mnemonicParsing="false" style="-fx-background-color: Green;" text="Ekle" />
+                              <Button fx:id="menuuruneklebtn" layoutX="348.0" layoutY="380.0" mnemonicParsing="false" style="-fx-background-color: Green;" text="Ekle" />
                            </children>
                         </AnchorPane>
                      </children>

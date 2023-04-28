@@ -7,11 +7,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 
 import javamudavimleri.siparistakip.fx.net.Istek;
-
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -47,6 +47,8 @@ public class Kontrolcu implements Initializable{
     @FXML
     Button girisbtn;
     @FXML
+    Button menuuruneklebtn;
+    @FXML
     PasswordField sifrefield;
     @FXML
     AnchorPane girispane;
@@ -70,6 +72,10 @@ public class Kontrolcu implements Initializable{
     Text siparismasatxt;
     @FXML
     Text odememasatxt;
+    @FXML
+    TextField menuurunaditxtf;
+    @FXML
+    TextField menuurunfiyattxtf;
     @FXML
     TableView<FisTablo> fistablo;
     @FXML
@@ -155,6 +161,8 @@ public class Kontrolcu implements Initializable{
     ListeEleman le;
     Istek istek;
     HashMap<String, String> kategoriler;
+    JSONObject girisYapan;
+    HashMap<String, Long> urunTuruIsimleri;
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
 		fissatirmasa.setCellValueFactory(new PropertyValueFactory<FisTablo, String>("masaAdi"));
@@ -238,6 +246,25 @@ public class Kontrolcu implements Initializable{
 			}
         };
         
+        menuuruneklebtn.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent arg0) {
+				try {
+					istek.urunEkle(girisYapan.getString("personelSifreHashed")
+							, menuurunaditxtf.getText()
+							, Double.parseDouble(menuurunfiyattxtf.getText())
+							, urunTuruIsimleri.get(menuecombo.getValue()));
+					menuurunfiyattxtf.setText("");
+					menuurunaditxtf.setText("");
+					if(urunTuruIsimleri.get(menukcombo.getValue()) != null) {
+						mkihguncelle(urunTuruIsimleri.get(menukcombo.getValue()));
+					}
+				}
+				catch(Exception e) {
+					e.printStackTrace();
+				}
+			}
+        });
         
 		a01.setOnMouseClicked(masaevent);
         a02.setOnMouseClicked(masaevent);
@@ -264,7 +291,8 @@ public class Kontrolcu implements Initializable{
             	if(giris.getInt("yanitKodu")==HttpStatus.OK.value()) {
             		giristxt.setText("Giriş başarılı! ");
             		giristxt.setFill(Color.GREEN);
-            		kullaniciaditxt.setText(giris.getString("personelAdi"));
+            		girisYapan = giris;
+            		kullaniciaditxt.setText(girisYapan.getString("personelAdi"));
             		girispane.setVisible(false);
             		masalarpane.setVisible(true);
             		barpane.setVisible(true);
@@ -278,18 +306,24 @@ public class Kontrolcu implements Initializable{
         menubtn.setOnAction(new EventHandler<ActionEvent>() {
             public void handle(ActionEvent e){
             	menukcombo.getItems().clear();
-            	menukcombo.getItems().addAll(kategoriler.keySet());
-            	menukcombo.setOnAction(new EventHandler<ActionEvent>() {
-					@Override
-					public void handle(ActionEvent arg0) {
-						menukitemholder.getChildren().add(
-								le.menukitempane("menuk" + kategoriler.get(menukcombo.getValue())
-												, kategoriler.get(menukcombo.getValue()), "4", menukdevent, menukcevent));
-						//siparisk ile aşşırı benzer
-					}
-            	});
             	menuecombo.getItems().clear();
-            	menuecombo.getItems().addAll(kategoriler.keySet());
+            	urunTuruIsimleri = new HashMap<String, Long>();
+            	JSONArray urunTurleri = istek.urunTurleri(girisYapan.getString("personelSifreHashed"));
+            	if(urunTurleri.getJSONObject(0).getInt("yanitKodu")==HttpStatus.OK.value()) {
+            		for(int i = 0 ; i < urunTurleri.length() ; i++) {
+            			menukcombo.getItems().add(urunTurleri.getJSONObject(i).getString("urunTuruAdi"));
+            			menuecombo.getItems().add(urunTurleri.getJSONObject(i).getString("urunTuruAdi"));
+            			urunTuruIsimleri.put(urunTurleri.getJSONObject(i).getString("urunTuruAdi"), urunTurleri.getJSONObject(i).getLong("id"));
+            		}
+            		menukcombo.setOnAction(new EventHandler<ActionEvent>() {
+    					@Override
+    					public void handle(ActionEvent arg0) {
+    						if(urunTuruIsimleri.get(menukcombo.getValue()) != null) {
+    							mkihguncelle(urunTuruIsimleri.get(menukcombo.getValue()));
+    						}
+    					}
+                	});
+            	}
             	masalarpane.setVisible(false);
                 menupane.setVisible(true);
             	siparispane.setVisible(false);
@@ -350,7 +384,17 @@ public class Kontrolcu implements Initializable{
             }
         });
 	}	
-	
+	public void mkihguncelle(Long urunTuruID) {
+		menukitemholder.getChildren().clear();
+		JSONArray urunler = istek.urunler(girisYapan.getString("personelSifreHashed")
+				, urunTuruID);
+		if(urunler.getJSONObject(0).getInt("yanitKodu")==HttpStatus.OK.value()) {
+			for(int i = 0 ; i < urunler.length() ; i++) {
+				menukitemholder.getChildren().add(le.menukitempane("menuk"+urunler.getJSONObject(i).getLong("id")
+				, urunler.getJSONObject(i).getString("urunAdi"), ""+urunler.getJSONObject(i).getDouble("urunFiyati"), menukdevent, menukcevent));
+			}
+		}
+	}
 	public void kategoriGetir(String kategoriID) {
 		sipariskitemholder.getChildren().clear();
 		sipariskitemler = new ArrayList<Node>();

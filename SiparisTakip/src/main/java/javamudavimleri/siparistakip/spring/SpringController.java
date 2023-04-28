@@ -1,5 +1,9 @@
 package javamudavimleri.siparistakip.spring;
 
+import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,11 +25,21 @@ public class SpringController {
     private PersonelDB personeldb;
 	@Autowired
     private IzinSeviyeDB izinseviyedb;
-	
+	@Autowired
+    private UrunDB urundb;
 	@PostMapping("/urunTuruEkle")
     @ResponseBody
     public ResponseEntity<String> urunTuruEkle(@RequestParam(name = "masterKey")String masterKey
     							, @RequestParam(name = "urunTuruAdi")String urunTuruAdi){
+		try {
+			masterKey = URLDecoder.decode(masterKey, "UTF-8");
+			urunTuruAdi = URLDecoder.decode(urunTuruAdi, "UTF-8");
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Parametreler hatalı! ");
+		}
+		
 		if(masterKey.equals(this.masterKey)) {
 			if(urunturudb.findByUrunTuruAdi(urunTuruAdi)!=null) {
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Zaten var! ");
@@ -39,6 +53,15 @@ public class SpringController {
     @ResponseBody
     public ResponseEntity<String> izinSeviyeEkle(@RequestParam(name = "masterKey")String masterKey
     							, @RequestParam(name = "izinSeviyeAdi")String izinSeviyeAdi){
+		try {
+			masterKey = URLDecoder.decode(masterKey, "UTF-8");
+			izinSeviyeAdi = URLDecoder.decode(izinSeviyeAdi, "UTF-8");
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Parametreler hatalı! ");
+		}
+		
 		if(masterKey.equals(this.masterKey)) {
 			if(izinseviyedb.findByIzinSeviyeAdi(izinSeviyeAdi)!=null) {
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Zaten var! ");
@@ -54,6 +77,17 @@ public class SpringController {
     							, @RequestParam(name = "personelAdi")String personelAdi
     							, @RequestParam(name = "personelSifreHashed")String sifreHashed
     							, @RequestParam(name = "izinSeviyeAdi")String izinSeviyeAdi){
+		try {
+			masterKey = URLDecoder.decode(masterKey, "UTF-8");
+			personelAdi = URLDecoder.decode(personelAdi, "UTF-8");
+			sifreHashed = URLDecoder.decode(sifreHashed, "UTF-8");
+			izinSeviyeAdi = URLDecoder.decode(izinSeviyeAdi, "UTF-8");
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Parametreler hatalı! ");
+		}
+		
 		if(masterKey.equals(this.masterKey)) {
 			IzinSeviye izinseviye = izinseviyedb.findByIzinSeviyeAdi(izinSeviyeAdi);
 			if(izinseviye==null) {
@@ -70,10 +104,87 @@ public class SpringController {
 	@GetMapping("/girisYap")
     @ResponseBody
     public ResponseEntity<Personel> sifreKontrol(@RequestParam(name = "sifreHashed")String sifreHashed){
+		try {
+			sifreHashed = URLDecoder.decode(sifreHashed, "UTF-8");
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Personel());
+		}
+		
 		Personel girisYapan = personeldb.findByPersonelSifreHashed(sifreHashed);
     	if(girisYapan==null) {
-    		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(girisYapan);
+    		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new Personel());
     	}
     	return  ResponseEntity.status(HttpStatus.OK).body(girisYapan);
+    }
+	@GetMapping("/urunTurleri")
+    @ResponseBody
+    public ResponseEntity<List<UrunTuru>> urunTurleri(@RequestParam(name = "sifreHashed")String sifreHashed){
+		try {
+			sifreHashed = URLDecoder.decode(sifreHashed, "UTF-8");
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ArrayList<UrunTuru>());
+		}
+		
+		Personel girisYapan = personeldb.findByPersonelSifreHashed(sifreHashed);
+    	if(girisYapan==null) {
+    		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ArrayList<UrunTuru>());
+    	}
+    	return ResponseEntity.status(HttpStatus.OK).body(urunturudb.findAll());
+    }
+	@PostMapping("/urunEkle")
+    @ResponseBody
+    public ResponseEntity<String> urunEkle(@RequestParam(name = "sifreHashed")String sifreHashed
+    							, @RequestParam(name = "urunAdi")String urunAdi
+    							, @RequestParam(name = "urunFiyati")String urunFiyati
+    							, @RequestParam(name = "urunTuruID")String urunTuruID){
+		try {
+			sifreHashed = URLDecoder.decode(sifreHashed, "UTF-8");
+			urunAdi = URLDecoder.decode(urunAdi, "UTF-8");
+			urunFiyati = URLDecoder.decode(urunFiyati, "UTF-8");
+			urunTuruID = URLDecoder.decode(urunTuruID, "UTF-8");
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Parametreler hatalı! ");
+		}
+		
+		Personel girisYapan = personeldb.findByPersonelSifreHashed(sifreHashed);
+    	if(girisYapan==null) {
+    		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Erişim izniniz yok! ");
+    	}
+    	if(urunturudb.findById(Long.parseLong(urunTuruID))==null) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Ürun türü bulunamadı! ");
+		}
+    	if(urundb.findByUrunAdi(urunAdi)!=null) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Zaten var! ");
+		}
+    	urundb.save(new Urun(urunAdi, Double.parseDouble(urunFiyati), Long.parseLong(urunTuruID)));
+    	return ResponseEntity.status(HttpStatus.OK).body("İşlem tamamlandı! ");
+    }
+	@GetMapping("/urunler")
+    @ResponseBody
+    public ResponseEntity<List<Urun>> urunler(@RequestParam(name = "sifreHashed")String sifreHashed
+    							, @RequestParam(name = "urunTuruID")String urunTuruID){
+		try {
+			sifreHashed = URLDecoder.decode(sifreHashed, "UTF-8");
+			urunTuruID = URLDecoder.decode(urunTuruID, "UTF-8");
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ArrayList<Urun>());
+		}
+		
+		Personel girisYapan = personeldb.findByPersonelSifreHashed(sifreHashed);
+    	if(girisYapan==null) {
+    		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ArrayList<Urun>());
+    	}
+    	if(urunturudb.findById(Long.parseLong(urunTuruID))==null) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ArrayList<Urun>());
+		}
+    	return ResponseEntity.status(HttpStatus.OK).body(urundb.findByUrunTuruID(Long.parseLong(urunTuruID)));
     }
 }

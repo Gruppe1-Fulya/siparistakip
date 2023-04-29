@@ -4,7 +4,7 @@ import java.util.Date;
 
 public class FisTablo {
 	private String masaAdi;
-	private int adisyonNo;
+	private long adisyonNo;
 	private double tutar;
 	private double tipToplami;
 	private double odenenTutar;
@@ -12,7 +12,7 @@ public class FisTablo {
 	private Date odenilenTarih;
 	private String personelAdi;
 	private String odemeNotu;
-	public FisTablo(String masaAdi, int adisyonNo, double tutar, double tipToplami, double odenenTutar, 
+	public FisTablo(String masaAdi, long adisyonNo, double tutar, double tipToplami, double odenenTutar, 
 			String odemeTuru, Date odenilenTarih, String personelAdi, String odemeNotu) {
 		this.setMasaAdi(masaAdi);
 		this.setAdisyonNo(adisyonNo);
@@ -30,10 +30,10 @@ public class FisTablo {
 	public void setMasaAdi(String masaAdi) {
 		this.masaAdi = masaAdi;
 	}
-	public int getAdisyonNo() {
+	public long getAdisyonNo() {
 		return adisyonNo;
 	}
-	public void setAdisyonNo(int adisyonNo) {
+	public void setAdisyonNo(long adisyonNo) {
 		this.adisyonNo = adisyonNo;
 	}
 	public double getTutar() {

@@ -632,19 +632,19 @@
                               <AnchorPane layoutY="260.0" prefHeight="60.0" prefWidth="640.0">
                                  <children>
                                     <Text layoutX="24.0" layoutY="35.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Ödeme Türü Seçiniz: " />
-                                    <ComboBox fx:id="odemeturucombo" layoutX="190.0" layoutY="18.0" prefWidth="150.0" promptText="Seçiniz... " />
+                                    <ComboBox fx:id="odemeyontemicombo" layoutX="190.0" layoutY="18.0" prefWidth="150.0" promptText="Seçiniz... " />
                                  </children>
                               </AnchorPane>
                               <AnchorPane layoutY="320.0" prefHeight="60.0" prefWidth="640.0">
                                  <children>
                                     <Text layoutX="24.0" layoutY="35.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Müşteri Notu: " />
-                                    <TextField layoutX="190.0" layoutY="18.0" text=" " />
+                                    <TextField fx:id="odemenottxtf" layoutX="190.0" layoutY="18.0" text=" " />
                                  </children>
                               </AnchorPane>
                               <AnchorPane layoutY="380.0" prefHeight="60.0" prefWidth="640.0">
                                  <children>
                                     <Text layoutX="24.0" layoutY="35.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Bahşiş Tutarı: " />
-                                    <TextField layoutX="190.0" layoutY="18.0" text="24" />
+                                    <TextField fx:id="odemebahsistxtf" layoutX="190.0" layoutY="18.0" text="0" />
                                     <Text layoutX="350.0" layoutY="35.0" strokeType="OUTSIDE" strokeWidth="0.0" text=" ₺" />
                                  </children>
                               </AnchorPane>
@@ -652,14 +652,14 @@
                               <AnchorPane layoutY="200.0" prefHeight="60.0" prefWidth="640.0">
                                  <children>
                                     <Text layoutX="24.0" layoutY="35.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Ara Toplam: " />
-                                    <Text layoutX="200.0" layoutY="35.0" strokeType="OUTSIDE" strokeWidth="0.0" text="326" />
                                     <Text layoutX="235.0" layoutY="35.0" strokeType="OUTSIDE" strokeWidth="0.0" text=" ₺" />
+                                    <Text fx:id="odemearatxt" layoutX="200.0" layoutY="35.0" strokeType="OUTSIDE" strokeWidth="0.0" text="326" />
                                  </children>
                               </AnchorPane>
                               <AnchorPane layoutY="440.0" prefHeight="60.0" prefWidth="640.0">
                                  <children>
                                     <Text layoutX="24.0" layoutY="35.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Genel Toplam: " />
-                                    <Text layoutX="200.0" layoutY="35.0" strokeType="OUTSIDE" strokeWidth="0.0" text="350" />
+                                    <Text fx:id="odemegeneltxt" layoutX="200.0" layoutY="35.0" strokeType="OUTSIDE" strokeWidth="0.0" text="350" />
                                     <Text layoutX="235.0" layoutY="35.0" strokeType="OUTSIDE" strokeWidth="0.0" text=" ₺" />
                                  </children>
                               </AnchorPane>

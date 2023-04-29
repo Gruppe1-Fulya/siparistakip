@@ -11,6 +11,8 @@ import java.net.URLEncoder;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestParam;
 
 public class Istek {
 	private String baseURL = "http://localhost:8080/";
@@ -108,6 +110,36 @@ public class Istek {
 			e.printStackTrace();
 		}
 		return istekJSONObject("bos", "POST", true);
+	}
+	public JSONArray odemeYontemleri(String sifreHashed) {
+		try {
+			return istekJSONArray("odemeYontemleri?sifreHashed="+URLEncoder.encode(sifreHashed, "UTF-8"), "GET");
+		}
+		catch(Exception e) {
+			e.printStackTrace();	
+		}
+		return istekJSONArray("bos", "GET");
+	}
+	public JSONObject odeme(String sifreHashed, long siparisID, long odemeYontemiID, double bahsis, String odemeNotu) {
+		try {
+			return istekJSONObject("odeme?sifreHashed="+URLEncoder.encode(sifreHashed, "UTF-8")
+					+"&siparisID="+URLEncoder.encode(""+siparisID, "UTF-8")+"&odemeYontemiID="+URLEncoder.encode(""+odemeYontemiID, "UTF-8")
+					+"&bahsis="+URLEncoder.encode(""+bahsis, "UTF-8")+"&odemeNotu="+URLEncoder.encode(odemeNotu, "UTF-8"), "POST", true);
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+			
+		}
+		return istekJSONObject("bos", "POST", true);
+	}
+	public JSONArray odemeGecmisi(String sifreHashed) {
+		try {
+			return istekJSONArray("odemeGecmisi?sifreHashed="+URLEncoder.encode(sifreHashed, "UTF-8"), "GET");
+		}
+		catch(Exception e) {
+			e.printStackTrace();	
+		}
+		return istekJSONArray("bos", "GET");
 	}
 	public String hashSHA256(String girdi) {
 		HexFormat hf = HexFormat.of();

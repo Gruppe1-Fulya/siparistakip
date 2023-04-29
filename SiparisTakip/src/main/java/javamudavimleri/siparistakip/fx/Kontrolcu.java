@@ -12,6 +12,8 @@ import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 
 import javamudavimleri.siparistakip.fx.net.Istek;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -75,9 +77,17 @@ public class Kontrolcu implements Initializable{
     @FXML
     Text siparistoplamtxt;
     @FXML
+    Text odemearatxt;
+    @FXML
+    Text odemegeneltxt;
+    @FXML
     TextField menuurunaditxtf;
     @FXML
     TextField menuurunfiyattxtf;
+    @FXML
+    TextField odemebahsistxtf;
+    @FXML
+    TextField odemenottxtf;
     @FXML
     TableView<FisTablo> fistablo;
     @FXML
@@ -145,7 +155,7 @@ public class Kontrolcu implements Initializable{
     @FXML
     VBox menukitemholder;
     @FXML
-    ComboBox<String> odemeturucombo;
+    ComboBox<String> odemeyontemicombo;
     @FXML
     ComboBox<String> sipariscombo;
     @FXML
@@ -162,11 +172,12 @@ public class Kontrolcu implements Initializable{
     List<Node> siparissitemler;
     ListeEleman le;
     Istek istek;
-    HashMap<String, String> kategoriler;
     JSONObject girisYapan;
     HashMap<String, Long> urunTuruIsimleri;
+    HashMap<String, Long> odemeYontemiIsimleri;
     String masaAdi;
     long masaSiparisID;
+    double bahsis;
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
 		fissatirmasa.setCellValueFactory(new PropertyValueFactory<FisTablo, String>("masaAdi"));
@@ -179,15 +190,6 @@ public class Kontrolcu implements Initializable{
         fissatirpersonel.setCellValueFactory(new PropertyValueFactory<FisTablo, String>("personelAdi"));
         fissatirnot.setCellValueFactory(new PropertyValueFactory<FisTablo, String>("odemeNotu"));
         
-        kategoriler = new HashMap<String, String>();
-        kategoriler.put("Ana Yemek", "ana");
-		kategoriler.put("Sıcak Başlangıç", "baslangic");
-		kategoriler.put("İçecek", "icecek");
-		kategoriler.put("Tatlı", "tatli");
-		kategoriler.put("Ara Sıcak", "ara");
-		kategoriler.put("Salata", "salata");
-		kategoriler.put("Meze", "meze");
-        
         le = new ListeEleman();
         istek = new Istek();
         
@@ -196,8 +198,6 @@ public class Kontrolcu implements Initializable{
             	Node tiklananmasa = (Node) arg0.getSource();
             	masaAdi = tiklananmasa.getId().substring(0, 1).toUpperCase();
             	masaAdi += "-" + tiklananmasa.getId().substring(1);
-            	siparismasatxt.setText(masaAdi);
-            	sipariskitemholder.getChildren().clear();
             	JSONObject masaSiparisi = istek.masaSiparisi(girisYapan.getString("personelSifreHashed"), masaAdi);
             	if(masaSiparisi.getInt("yanitKodu")==HttpStatus.NOT_FOUND.value()) {
             		if(istek.masaGuncelle(girisYapan.getString("personelSifreHashed"), masaAdi).getInt("yanitKodu")==HttpStatus.OK.value()) {
@@ -205,11 +205,13 @@ public class Kontrolcu implements Initializable{
             		}
             	}
             	if(masaSiparisi.getInt("yanitKodu")==HttpStatus.OK.value()) {
-            		masaSiparisID = masaSiparisi.getLong("id");
-            		sipariscombo.getItems().clear();
-            		urunTuruIsimleri = new HashMap<String, Long>();
+            		siparismasatxt.setText(masaAdi);
+                	sipariskitemholder.getChildren().clear();
             		JSONArray urunTurleri = istek.urunTurleri(girisYapan.getString("personelSifreHashed"));
                 	if(urunTurleri.getJSONObject(0).getInt("yanitKodu")==HttpStatus.OK.value()) {
+                		masaSiparisID = masaSiparisi.getLong("id");
+                		sipariscombo.getItems().clear();
+                		urunTuruIsimleri = new HashMap<String, Long>();
                 		for(int i = 0 ; i < urunTurleri.length() ; i++) {
                 			sipariscombo.getItems().add(urunTurleri.getJSONObject(i).getString("urunTuruAdi"));
                 			urunTuruIsimleri.put(urunTurleri.getJSONObject(i).getString("urunTuruAdi"), urunTurleri.getJSONObject(i).getLong("id"));
@@ -222,10 +224,10 @@ public class Kontrolcu implements Initializable{
         						}
         					}
                     	});
+                		ssihguncelle(masaAdi);
+                		masalarpane.setVisible(false);
+                        siparispane.setVisible(true);
                 	}
-                	ssihguncelle(masaAdi);
-            		masalarpane.setVisible(false);
-                    siparispane.setVisible(true);
             	}
             }
         };
@@ -320,19 +322,16 @@ public class Kontrolcu implements Initializable{
         menuuruneklebtn.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent arg0) {
-				try {
-					istek.urunEkle(girisYapan.getString("personelSifreHashed")
+				JSONObject urunEkle = istek.urunEkle(girisYapan.getString("personelSifreHashed")
 							, menuurunaditxtf.getText()
 							, Double.parseDouble(menuurunfiyattxtf.getText())
 							, urunTuruIsimleri.get(menuecombo.getValue()));
+				if(urunEkle.getInt("yanitKodu")==HttpStatus.OK.value()) {
 					menuurunfiyattxtf.setText("");
 					menuurunaditxtf.setText("");
 					if(urunTuruIsimleri.get(menukcombo.getValue()) != null) {
 						mkihguncelle(urunTuruIsimleri.get(menukcombo.getValue()));
 					}
-				}
-				catch(Exception e) {
-					e.printStackTrace();
 				}
 			}
         });
@@ -376,11 +375,11 @@ public class Kontrolcu implements Initializable{
         });
         menubtn.setOnAction(new EventHandler<ActionEvent>() {
             public void handle(ActionEvent e){
-            	menukcombo.getItems().clear();
-            	menuecombo.getItems().clear();
-            	urunTuruIsimleri = new HashMap<String, Long>();
             	JSONArray urunTurleri = istek.urunTurleri(girisYapan.getString("personelSifreHashed"));
             	if(urunTurleri.getJSONObject(0).getInt("yanitKodu")==HttpStatus.OK.value()) {
+            		menukcombo.getItems().clear();
+                	menuecombo.getItems().clear();
+                	urunTuruIsimleri = new HashMap<String, Long>();
             		for(int i = 0 ; i < urunTurleri.length() ; i++) {
             			menukcombo.getItems().add(urunTurleri.getJSONObject(i).getString("urunTuruAdi"));
             			menuecombo.getItems().add(urunTurleri.getJSONObject(i).getString("urunTuruAdi"));
@@ -394,27 +393,33 @@ public class Kontrolcu implements Initializable{
     						}
     					}
                 	});
+            		masalarpane.setVisible(false);
+                    menupane.setVisible(true);
+                	siparispane.setVisible(false);
+                	fislerpane.setVisible(false);
+                	odemepane.setVisible(false);
             	}
-            	masalarpane.setVisible(false);
-                menupane.setVisible(true);
-            	siparispane.setVisible(false);
-            	fislerpane.setVisible(false);
-            	odemepane.setVisible(false);
             }
         });
         fislerbtn.setOnAction(new EventHandler<ActionEvent>() {
             public void handle(ActionEvent e) {
-                ObservableList<FisTablo> girdiler = fistablo.getItems();
-                FisTablo girdi = new FisTablo("A-09", 35, 356.65, 3.35, 360.00, "PayPal", new Date(System.currentTimeMillis()), "yasin", "");
-                girdiler.add(girdi);
-                girdi = new FisTablo("A-15", 41, 376.65, 3.35, 380.00, "Netflix Hediye Kartı", new Date(System.currentTimeMillis()+1000*60*60*24), "kerem", "Hizmet Güzeldi");
-                girdiler.add(girdi);
-                fistablo.setItems(girdiler);
-            	masalarpane.setVisible(false);
-                menupane.setVisible(false);
-            	siparispane.setVisible(false);
-            	fislerpane.setVisible(true);
-            	odemepane.setVisible(false);
+            	JSONArray odemeGecmisi = istek.odemeGecmisi(girisYapan.getString("personelSifreHashed"));
+            	if(odemeGecmisi.getJSONObject(0).getInt("yanitKodu")==HttpStatus.OK.value()) {
+            		ObservableList<FisTablo> girdiler = fistablo.getItems();
+            		for(int i = 0 ; i < odemeGecmisi.length() ; i++) {
+            			JSONObject odeme = odemeGecmisi.getJSONObject(0);
+            			double fisBahsis = odeme.getDouble("bahsis");
+            			double fisToplam = odeme.getDouble("toplam");
+            			girdiler.add(new FisTablo(odeme.getString("masaAdi"), odeme.getLong("id"), fisToplam-fisBahsis, fisBahsis, fisToplam
+            				, odeme.getString("odemeYontemiAdi"), new Date(odeme.getLong("odemeZamani")), odeme.getString("personelAdi"), odeme.getString("odemeNotu")));
+            		}
+                    fistablo.setItems(girdiler);
+                	masalarpane.setVisible(false);
+                    menupane.setVisible(false);
+                	siparispane.setVisible(false);
+                	fislerpane.setVisible(true);
+                	odemepane.setVisible(false);
+            	}
             }
         });
         masalarbtn.setOnAction(new EventHandler<ActionEvent>() {
@@ -434,32 +439,78 @@ public class Kontrolcu implements Initializable{
         });
         odemebtn.setOnAction(new EventHandler<ActionEvent>() {
             public void handle(ActionEvent e){
-            	odememasatxt.setText(siparismasatxt.getText());
-            	//String siparismasaID = siparismasatxt.getText().substring(0, 1).toLowerCase() + siparismasatxt.getText().substring(2);
-            	odemeitemholder.getChildren().clear();
-            	odemeitemler = new ArrayList<Node>();
-            	for(int i = 0 ; i < 30 ; i++) {
-            		odemeitemler.add(le.odemeitempane("odemeitem"+(i+1), "Sardalya", "32", "4")) ;
-            		odemeitemholder.getChildren().add(odemeitemler.get(i));
+            	JSONObject masaSiparisi = istek.masaSiparisi(girisYapan.getString("personelSifreHashed"), masaAdi);
+        		if(masaSiparisi.getInt("yanitKodu")==HttpStatus.OK.value()) {
+        			odemeitemholder.getChildren().clear();
+                	odemeitemler = new ArrayList<Node>();
+        			odemearatxt.setText(""+masaSiparisi.getDouble("toplamTutar"));
+        			odemegeneltxt.setText(""+masaSiparisi.getDouble("toplamTutar"));
+        			odemenottxtf.setText("");
+        			odemebahsistxtf.setText("0");
+        			bahsis = 0;
+        			odememasatxt.setText(masaSiparisi.getString("masaAdi"));
+        			JSONObject urunlerObje = new JSONObject(masaSiparisi.getString("urunler"));
+        			JSONArray urunler = new JSONArray();
+        			for(String urunID: urunlerObje.keySet()) {
+        				JSONObject urun = istek.urun(girisYapan.getString("personelSifreHashed"), Long.parseLong(urunID));
+        				urun.put("miktar", urunlerObje.getInt(urunID));
+        				urunler.put(urun);
+        			}
+        			for(int i = 0 ; i < urunler.length() ; i++) {
+        				odemeitemholder.getChildren().add(le.odemeitempane("odeme"+urunler.getJSONObject(i).getLong("id")
+        				, urunler.getJSONObject(i).getString("urunAdi"), ""+urunler.getJSONObject(i).getDouble("urunFiyati")
+        				, ""+urunler.getJSONObject(i).getInt("miktar")));
+        			}
+        		}
+        		JSONArray odemeYontemleri = istek.odemeYontemleri(girisYapan.getString("personelSifreHashed"));
+            	if(odemeYontemleri.getJSONObject(0).getInt("yanitKodu")==HttpStatus.OK.value()) {
+            		odemeYontemiIsimleri = new HashMap<String, Long>();
+            		odemeyontemicombo.getItems().clear();
+            		for(int i = 0 ; i < odemeYontemleri.length() ; i++) {
+            			odemeyontemicombo.getItems().add(odemeYontemleri.getJSONObject(i).getString("odemeYontemiAdi"));
+            			odemeYontemiIsimleri.put(odemeYontemleri.getJSONObject(i).getString("odemeYontemiAdi"), odemeYontemleri.getJSONObject(i).getLong("id"));
+            		}
+            		sipariscombo.setOnAction(new EventHandler<ActionEvent>() {
+    					@Override
+    					public void handle(ActionEvent arg0) {
+    						if(urunTuruIsimleri.get(sipariscombo.getValue()) != null) {
+    							skihguncelle(urunTuruIsimleri.get(sipariscombo.getValue()));
+    						}
+    					}
+                	});
+            		odemebahsistxtf.textProperty().addListener(new ChangeListener<String>() {
+    					@Override
+    					public void changed(ObservableValue<? extends String> arg0, String eski, String yeni) {
+    						try {
+    							bahsis = Double.parseDouble(yeni);
+    						}
+    						catch(Exception e) {
+    							e.printStackTrace();
+    						}
+    						odemegeneltxt.setText(""+(Double.parseDouble(odemearatxt.getText())+bahsis));
+    					}
+                	});
+                	siparispane.setVisible(false);
+                	odemepane.setVisible(true);
             	}
-            	odemeturucombo.getItems().clear();
-            	odemeturucombo.getItems().addAll(new String[]{"Nakit", "Kredi Kartı", "Netflix Hediye Kartı", "PayPal"});
-            	siparispane.setVisible(false);
-            	odemepane.setVisible(true);
             }
         });
         odemetamamlabtn.setOnAction(new EventHandler<ActionEvent>() {
             public void handle(ActionEvent e){
-            	odemepane.setVisible(false);
-            	masalarpane.setVisible(true);
+            	JSONObject odeme = istek.odeme(girisYapan.getString("personelSifreHashed"), masaSiparisID
+            			, odemeYontemiIsimleri.get(odemeyontemicombo.getValue()), bahsis, odemenottxtf.getText());
+            	if(odeme.getInt("yanitKodu")==HttpStatus.OK.value()) {
+            		odemepane.setVisible(false);
+                	masalarpane.setVisible(true);
+            	}
             }
         });
 	}	
 	public void mkihguncelle(long urunTuruID) {
-		menukitemholder.getChildren().clear();
 		JSONArray urunler = istek.urunler(girisYapan.getString("personelSifreHashed")
 				, urunTuruID);
 		if(urunler.getJSONObject(0).getInt("yanitKodu")==HttpStatus.OK.value()) {
+			menukitemholder.getChildren().clear();
 			for(int i = 0 ; i < urunler.length() ; i++) {
 				menukitemholder.getChildren().add(le.menukitempane("menuk"+urunler.getJSONObject(i).getLong("id")
 				, urunler.getJSONObject(i).getString("urunAdi"), ""+urunler.getJSONObject(i).getDouble("urunFiyati"), menukdevent, menukcevent));
@@ -467,10 +518,10 @@ public class Kontrolcu implements Initializable{
 		}
 	}
 	public void skihguncelle(long urunTuruID) {
-		sipariskitemholder.getChildren().clear();
 		JSONArray urunler = istek.urunler(girisYapan.getString("personelSifreHashed")
 				, urunTuruID);
 		if(urunler.getJSONObject(0).getInt("yanitKodu")==HttpStatus.OK.value()) {
+			sipariskitemholder.getChildren().clear();
 			for(int i = 0 ; i < urunler.length() ; i++) {
 				sipariskitemholder.getChildren().add(le.sipariskitempane("siparisk"+urunler.getJSONObject(i).getLong("id")
 				, urunler.getJSONObject(i).getString("urunAdi"), ""+urunler.getJSONObject(i).getDouble("urunFiyati"), sipariskeevent));
@@ -478,10 +529,10 @@ public class Kontrolcu implements Initializable{
 		}
 	}
 	public void ssihguncelle(String ssihMasaAdi) {
-		siparissitemler = new ArrayList<Node>();
-    	siparissitemholder.getChildren().clear();
 		JSONObject masaSiparisi = istek.masaSiparisi(girisYapan.getString("personelSifreHashed"), ssihMasaAdi);
 		if(masaSiparisi.getInt("yanitKodu")==HttpStatus.OK.value()) {
+			siparissitemler = new ArrayList<Node>();
+	    	siparissitemholder.getChildren().clear();
 			siparistoplamtxt.setText(""+masaSiparisi.getDouble("toplamTutar"));
 			JSONObject urunlerObje = new JSONObject(masaSiparisi.getString("urunler"));
 			JSONArray urunler = new JSONArray();
@@ -497,50 +548,4 @@ public class Kontrolcu implements Initializable{
 			}
 		}
 	}
-	/*public void kategoriGetir(String kategoriID) {
-		sipariskitemholder.getChildren().clear();
-		sipariskitemler = new ArrayList<Node>();
-		if(kategoriID.equals("ana")) {
-			for(int i = 0 ; i < 64 ; i++) {
-	    		sipariskitemler.add(le.sipariskitempane("sipariskAna"+(i+1), "Ana"+(i+1), "64", sipariskeevent)) ;
-	    		sipariskitemholder.getChildren().add(sipariskitemler.get(i));
-	    	}
-		}
-		else if(kategoriID.equals("baslangic")) {
-			for(int i = 0 ; i < 32 ; i++) {
-	    		sipariskitemler.add(le.sipariskitempane("sipariskBaslangic"+(i+1), "Baslangic"+(i+1), "32", sipariskeevent)) ;
-	    		sipariskitemholder.getChildren().add(sipariskitemler.get(i));
-	    	}
-		}
-		else if(kategoriID.equals("icecek")) {
-			for(int i = 0 ; i < 16 ; i++) {
-	    		sipariskitemler.add(le.sipariskitempane("siparisIicecek"+(i+1), "Icecek"+(i+1), "16", sipariskeevent)) ;
-	    		sipariskitemholder.getChildren().add(sipariskitemler.get(i));
-	    	}
-		}	
-		else if(kategoriID.equals("tatli")) {
-			for(int i = 0 ; i < 8 ; i++) {
-	    		sipariskitemler.add(le.sipariskitempane("sipariskTatli"+(i+1), "Tatli"+(i+1), "8", sipariskeevent)) ;
-	    		sipariskitemholder.getChildren().add(sipariskitemler.get(i));
-	    	}
-		}
-		else if(kategoriID.equals("ara")) {
-			for(int i = 0 ; i < 4 ; i++) {
-	    		sipariskitemler.add(le.sipariskitempane("sipariskAra"+(i+1), "Ara"+(i+1), "4", sipariskeevent)) ;
-	    		sipariskitemholder.getChildren().add(sipariskitemler.get(i));
-	    	}
-		}
-		else if(kategoriID.equals("salata")) {
-			for(int i = 0 ; i < 2 ; i++) {
-	    		sipariskitemler.add(le.sipariskitempane("sipariskSalata"+(i+1), "Salata"+(i+1), "2", sipariskeevent)) ;
-	    		sipariskitemholder.getChildren().add(sipariskitemler.get(i));
-	    	}
-		}
-		else if(kategoriID.equals("meze")) {
-			for(int i = 0 ; i < 1 ; i++) {
-	    		sipariskitemler.add(le.sipariskitempane("sipariskMeze"+(i+1), "Meze"+(i+1), "1", sipariskeevent)) ;
-	    		sipariskitemholder.getChildren().add(sipariskitemler.get(i));
-	    	}
-		}
-	}*/
 }

@@ -73,6 +73,8 @@ public class Kontrolcu implements Initializable{
     @FXML
     Text odememasatxt;
     @FXML
+    Text siparistoplamtxt;
+    @FXML
     TextField menuurunaditxtf;
     @FXML
     TextField menuurunfiyattxtf;
@@ -163,6 +165,8 @@ public class Kontrolcu implements Initializable{
     HashMap<String, String> kategoriler;
     JSONObject girisYapan;
     HashMap<String, Long> urunTuruIsimleri;
+    String masaAdi;
+    long masaSiparisID;
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
 		fissatirmasa.setCellValueFactory(new PropertyValueFactory<FisTablo, String>("masaAdi"));
@@ -188,29 +192,64 @@ public class Kontrolcu implements Initializable{
         istek = new Istek();
         
         masaevent = new EventHandler<MouseEvent>() {
-            public void handle(MouseEvent e){
-            	Node tiklananmasa = (Node) e.getSource();
-            	String masaAdi = tiklananmasa.getId().substring(0, 1).toUpperCase();
+            public void handle(MouseEvent arg0){
+            	Node tiklananmasa = (Node) arg0.getSource();
+            	masaAdi = tiklananmasa.getId().substring(0, 1).toUpperCase();
             	masaAdi += "-" + tiklananmasa.getId().substring(1);
             	siparismasatxt.setText(masaAdi);
-            	sipariscombo.getItems().clear();
-            	sipariscombo.getItems().addAll(kategoriler.keySet());
-            	sipariscombo.setOnAction(new EventHandler<ActionEvent>() {
-					@Override
-					public void handle(ActionEvent arg0) {
-						kategoriGetir(kategoriler.get(sipariscombo.getValue()));
-					}
-            	});
-            	siparissitemholder.getChildren().clear();
-        		siparissitemler = new ArrayList<Node>();
-        		masalarpane.setVisible(false);
-                siparispane.setVisible(true);
+            	sipariskitemholder.getChildren().clear();
+            	JSONObject masaSiparisi = istek.masaSiparisi(girisYapan.getString("personelSifreHashed"), masaAdi);
+            	if(masaSiparisi.getInt("yanitKodu")==HttpStatus.NOT_FOUND.value()) {
+            		if(istek.masaGuncelle(girisYapan.getString("personelSifreHashed"), masaAdi).getInt("yanitKodu")==HttpStatus.OK.value()) {
+            			masaSiparisi = istek.masaSiparisi(girisYapan.getString("personelSifreHashed"), masaAdi);
+            		}
+            	}
+            	if(masaSiparisi.getInt("yanitKodu")==HttpStatus.OK.value()) {
+            		masaSiparisID = masaSiparisi.getLong("id");
+            		sipariscombo.getItems().clear();
+            		urunTuruIsimleri = new HashMap<String, Long>();
+            		JSONArray urunTurleri = istek.urunTurleri(girisYapan.getString("personelSifreHashed"));
+                	if(urunTurleri.getJSONObject(0).getInt("yanitKodu")==HttpStatus.OK.value()) {
+                		for(int i = 0 ; i < urunTurleri.length() ; i++) {
+                			sipariscombo.getItems().add(urunTurleri.getJSONObject(i).getString("urunTuruAdi"));
+                			urunTuruIsimleri.put(urunTurleri.getJSONObject(i).getString("urunTuruAdi"), urunTurleri.getJSONObject(i).getLong("id"));
+                		}
+                		sipariscombo.setOnAction(new EventHandler<ActionEvent>() {
+        					@Override
+        					public void handle(ActionEvent arg0) {
+        						if(urunTuruIsimleri.get(sipariscombo.getValue()) != null) {
+        							skihguncelle(urunTuruIsimleri.get(sipariscombo.getValue()));
+        						}
+        					}
+                    	});
+                	}
+                	ssihguncelle(masaAdi);
+            		masalarpane.setVisible(false);
+                    siparispane.setVisible(true);
+            	}
             }
         };
         siparisscevent = new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent arg0) {
-				
+				AnchorPane siparisscitem = (AnchorPane)((Node)(arg0.getSource())).getParent();
+				TextField siparisscmiktar = (TextField)siparisscitem.lookup("#"+siparisscitem.getId()+"m");
+				boolean basariliMi = false;
+				int miktar = 0;
+				try {
+					miktar = Integer.valueOf(siparisscmiktar.getText());
+					basariliMi = true;
+				}
+            	catch(Exception e) {
+            		e.printStackTrace();
+            	}
+				if(basariliMi && miktar > 0) {
+					JSONObject yanit = istek.siparisGuncelle(girisYapan.getString("personelSifreHashed")
+							, masaSiparisID, Long.parseLong(siparisscitem.getId().substring(8)), miktar*(-1));
+					if(yanit.getInt("yanitKodu")==HttpStatus.OK.value()) {
+						ssihguncelle(masaAdi);	
+					}
+				}
 			}
         };
         menukcevent = new EventHandler<ActionEvent>() {
@@ -218,7 +257,8 @@ public class Kontrolcu implements Initializable{
 			public void handle(ActionEvent arg0) {
 				try {
 					AnchorPane menukcitem = (AnchorPane)((Node)(arg0.getSource())).getParent();
-					if(istek.urunCikar(girisYapan.getString("personelSifreHashed"), menukcitem.getId().substring(5)).getInt("yanitKodu")==HttpStatus.OK.value()) {
+					if(istek.urunCikar(girisYapan.getString("personelSifreHashed")
+							, menukcitem.getId().substring(5)).getInt("yanitKodu")==HttpStatus.OK.value()) {
 						if(urunTuruIsimleri.get(menukcombo.getValue()) != null) {
 							mkihguncelle(urunTuruIsimleri.get(menukcombo.getValue()));
 						}
@@ -269,8 +309,11 @@ public class Kontrolcu implements Initializable{
             		e.printStackTrace();
             	}
 				if(basariliMi && miktar > 0) {
-					siparissitemler.add(le.siparissitempane("sipariss"+sipariskeitem.getId(), sipariskeitem.getId(), "64", ""+miktar, siparisscevent)) ;
-		    		siparissitemholder.getChildren().setAll(siparissitemler);	
+					JSONObject yanit = istek.siparisGuncelle(girisYapan.getString("personelSifreHashed")
+							, masaSiparisID, Long.parseLong(sipariskeitem.getId().substring(8)), miktar);
+					if(yanit.getInt("yanitKodu")==HttpStatus.OK.value()) {
+						ssihguncelle(masaAdi);	
+					}
 				}
 			}
         };
@@ -412,7 +455,7 @@ public class Kontrolcu implements Initializable{
             }
         });
 	}	
-	public void mkihguncelle(Long urunTuruID) {
+	public void mkihguncelle(long urunTuruID) {
 		menukitemholder.getChildren().clear();
 		JSONArray urunler = istek.urunler(girisYapan.getString("personelSifreHashed")
 				, urunTuruID);
@@ -423,7 +466,38 @@ public class Kontrolcu implements Initializable{
 			}
 		}
 	}
-	public void kategoriGetir(String kategoriID) {
+	public void skihguncelle(long urunTuruID) {
+		sipariskitemholder.getChildren().clear();
+		JSONArray urunler = istek.urunler(girisYapan.getString("personelSifreHashed")
+				, urunTuruID);
+		if(urunler.getJSONObject(0).getInt("yanitKodu")==HttpStatus.OK.value()) {
+			for(int i = 0 ; i < urunler.length() ; i++) {
+				sipariskitemholder.getChildren().add(le.sipariskitempane("siparisk"+urunler.getJSONObject(i).getLong("id")
+				, urunler.getJSONObject(i).getString("urunAdi"), ""+urunler.getJSONObject(i).getDouble("urunFiyati"), sipariskeevent));
+			}
+		}
+	}
+	public void ssihguncelle(String ssihMasaAdi) {
+		siparissitemler = new ArrayList<Node>();
+    	siparissitemholder.getChildren().clear();
+		JSONObject masaSiparisi = istek.masaSiparisi(girisYapan.getString("personelSifreHashed"), ssihMasaAdi);
+		if(masaSiparisi.getInt("yanitKodu")==HttpStatus.OK.value()) {
+			siparistoplamtxt.setText(""+masaSiparisi.getDouble("toplamTutar"));
+			JSONObject urunlerObje = new JSONObject(masaSiparisi.getString("urunler"));
+			JSONArray urunler = new JSONArray();
+			for(String urunID: urunlerObje.keySet()) {
+				JSONObject urun = istek.urun(girisYapan.getString("personelSifreHashed"), Long.parseLong(urunID));
+				urun.put("miktar", urunlerObje.getInt(urunID));
+				urunler.put(urun);
+			}
+			for(int i = 0 ; i < urunler.length() ; i++) {
+				siparissitemholder.getChildren().add(le.siparissitempane("sipariss"+urunler.getJSONObject(i).getLong("id")
+				, urunler.getJSONObject(i).getString("urunAdi"), ""+urunler.getJSONObject(i).getDouble("urunFiyati")
+				, ""+urunler.getJSONObject(i).getInt("miktar"), siparisscevent));
+			}
+		}
+	}
+	/*public void kategoriGetir(String kategoriID) {
 		sipariskitemholder.getChildren().clear();
 		sipariskitemler = new ArrayList<Node>();
 		if(kategoriID.equals("ana")) {
@@ -468,5 +542,5 @@ public class Kontrolcu implements Initializable{
 	    		sipariskitemholder.getChildren().add(sipariskitemler.get(i));
 	    	}
 		}
-	}
+	}*/
 }

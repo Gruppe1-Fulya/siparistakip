@@ -14,6 +14,9 @@ public class UrunTuru {
     private Long id;
 	private String urunTuruAdi;
 	public UrunTuru() {}
+	public UrunTuru(long id) {
+		this.id = id;
+	}
 	public UrunTuru(String urunTuruAdi) {
 		this.setUrunTuruAdi(urunTuruAdi);
 	}
@@ -23,7 +26,7 @@ public class UrunTuru {
 	public void setUrunTuruAdi(String urunTuruAdi) {
 		this.urunTuruAdi = urunTuruAdi;
 	}
-	public Long getId() {
+	public long getId() {
 		return id;
 	}
 }

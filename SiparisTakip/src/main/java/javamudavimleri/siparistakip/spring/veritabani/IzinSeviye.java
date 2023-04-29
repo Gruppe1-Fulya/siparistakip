@@ -15,6 +15,9 @@ public class IzinSeviye {
 	private String izinSeviyeAdi;
 	private int izinSeviyesi;
 	public IzinSeviye() {}
+	public IzinSeviye(long id) {
+		this.id = id;
+	}
 	public IzinSeviye(String izinSeviyeAdi, int izinSeviyesi) {
 		this.setIzinSeviyeAdi(izinSeviyeAdi);
 		this.setIzinSeviyesi(izinSeviyesi);
@@ -31,7 +34,7 @@ public class IzinSeviye {
 	public void setIzinSeviyesi(int izinSeviyesi) {
 		this.izinSeviyesi = izinSeviyesi;
 	}
-	public Long getId() {
+	public long getId() {
 		return id;
 	}
 }

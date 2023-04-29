@@ -14,9 +14,12 @@ public class Urun {
     private Long id;
 	private String urunAdi;
 	private double urunFiyati;
-	private Long urunTuruID;
+	private long urunTuruID;
 	public Urun() {}
-	public Urun(String urunAdi, double urunFiyati, Long urunTuruID) {
+	public Urun(long id) {
+		this.id = id;
+	}
+	public Urun(String urunAdi, double urunFiyati, long urunTuruID) {
 		this.setUrunAdi(urunAdi);
 		this.setUrunFiyati(urunFiyati);
 		this.setUrunTuruID(urunTuruID);
@@ -33,13 +36,13 @@ public class Urun {
 	public void setUrunFiyati(double urunFiyati) {
 		this.urunFiyati = urunFiyati;
 	}
-	public Long getUrunTuruID() {
+	public long getUrunTuruID() {
 		return urunTuruID;
 	}
-	public void setUrunTuruID(Long urunTuruID) {
+	public void setUrunTuruID(long urunTuruID) {
 		this.urunTuruID = urunTuruID;
 	}
-	public Long getId() {
+	public long getId() {
 		return id;
 	}
 }

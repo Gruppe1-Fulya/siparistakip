@@ -13,10 +13,13 @@ public class Personel {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 	private String personelAdi;
-	private Long izinSeviyeID;
+	private long izinSeviyeID;
 	private String personelSifreHashed;
 	public Personel() {}
-	public Personel(String personelAdi, Long izinSeviyeID, String personelSifreHashed) {
+	public Personel(long id) {
+		this.id = id;
+	}
+	public Personel(String personelAdi, long izinSeviyeID, String personelSifreHashed) {
 		this.setPersonelAdi(personelAdi);
 		this.setIzinSeviyeID(izinSeviyeID);
 		this.setPersonelSifreHashed(personelSifreHashed);
@@ -27,10 +30,10 @@ public class Personel {
 	public void setPersonelAdi(String personelAdi) {
 		this.personelAdi = personelAdi;
 	}
-	public Long getIzinSeviyeID() {
+	public long getIzinSeviyeID() {
 		return izinSeviyeID;
 	}
-	public void setIzinSeviyeID(Long izinSeviyeID) {
+	public void setIzinSeviyeID(long izinSeviyeID) {
 		this.izinSeviyeID = izinSeviyeID;
 	}
 	public String getPersonelSifreHashed() {
@@ -39,7 +42,7 @@ public class Personel {
 	public void setPersonelSifreHashed(String personelSifreHashed) {
 		this.personelSifreHashed = personelSifreHashed;
 	}
-	public Long getId() {
+	public long getId() {
 		return id;
 	}
 }

@@ -27,6 +27,10 @@ public class SpringController {
     private IzinSeviyeDB izinseviyedb;
 	@Autowired
     private UrunDB urundb;
+	@Autowired
+    private MasaDB masadb;
+	@Autowired
+    private SiparisDB siparisdb;
 	@PostMapping("/urunTuruEkle")
     @ResponseBody
     public ResponseEntity<String> urunTuruEkle(@RequestParam(name = "masterKey")String masterKey
@@ -77,7 +81,7 @@ public class SpringController {
     @ResponseBody
     public ResponseEntity<String> personelEkle(@RequestParam(name = "masterKey")String masterKey
     							, @RequestParam(name = "personelAdi")String personelAdi
-    							, @RequestParam(name = "personelSifreHashed")String sifreHashed
+    							, @RequestParam(name = "sifreHashed")String sifreHashed
     							, @RequestParam(name = "izinSeviyeAdi")String izinSeviyeAdi){
 		try {
 			masterKey = URLDecoder.decode(masterKey, "UTF-8");
@@ -111,12 +115,12 @@ public class SpringController {
 		}
 		catch(Exception e) {
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Personel());
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Personel(-1L));
 		}
 		
 		Personel girisYapan = personeldb.findByPersonelSifreHashed(sifreHashed);
     	if(girisYapan==null) {
-    		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new Personel());
+    		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new Personel(-1L));
     	}
     	return  ResponseEntity.status(HttpStatus.OK).body(girisYapan);
     }
@@ -163,7 +167,7 @@ public class SpringController {
     		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Erişim izniniz yok! ");
     	}
     	if(urunturudb.findById(Long.parseLong(urunTuruID))==null) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Ürun türü bulunamadı! ");
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Ürun türü bulunamadı! ");
 		}
     	if(urundb.findByUrunAdi(urunAdi)!=null) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Zaten var! ");
@@ -193,7 +197,7 @@ public class SpringController {
     		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Erişim izniniz yok! ");
     	}
     	if(urundb.findById(Long.parseLong(urunID))==null) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Ürun bulunamadı! ");
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Ürun bulunamadı! ");
 		}
     	urundb.deleteById(Long.parseLong(urunID));
     	return ResponseEntity.status(HttpStatus.OK).body("İşlem tamamlandı! ");
@@ -216,8 +220,105 @@ public class SpringController {
     		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ArrayList<Urun>());
     	}
     	if(urunturudb.findById(Long.parseLong(urunTuruID))==null) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ArrayList<Urun>());
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ArrayList<Urun>());
 		}
     	return ResponseEntity.status(HttpStatus.OK).body(urundb.findByUrunTuruID(Long.parseLong(urunTuruID)));
+    }
+	@GetMapping("/masaSiparisi")
+    @ResponseBody
+    public ResponseEntity<Siparis> masaSiparisi(@RequestParam(name = "sifreHashed")String sifreHashed
+    							, @RequestParam(name = "masaAdi")String masaAdi){
+		try {
+			sifreHashed = URLDecoder.decode(sifreHashed, "UTF-8");
+			masaAdi = URLDecoder.decode(masaAdi, "UTF-8");
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Siparis(-1L));
+		}
+		Personel girisYapan = personeldb.findByPersonelSifreHashed(sifreHashed);
+    	if(girisYapan==null) {
+    		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new Siparis(-1L));
+    	}
+    	if(masadb.findByMasaAdi(masaAdi)==null) {
+    		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Siparis(-1L));
+    	}
+    	return ResponseEntity.status(HttpStatus.OK).body(siparisdb.findById(masadb.findByMasaAdi(masaAdi).getSiparisID()).get());
+		
+    }
+	@PostMapping("/masaGuncelle")
+    @ResponseBody
+    public ResponseEntity<String> masaGuncelle(@RequestParam(name = "sifreHashed")String sifreHashed
+    							, @RequestParam(name = "masaAdi")String masaAdi){
+		try {
+			sifreHashed = URLDecoder.decode(sifreHashed, "UTF-8");
+			masaAdi = URLDecoder.decode(masaAdi, "UTF-8");
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Parametreler hatalı! ");
+		}
+		Personel girisYapan = personeldb.findByPersonelSifreHashed(sifreHashed);
+    	if(girisYapan==null) {
+    		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Erişim izniniz yok! ");
+    	}
+		if(masadb.findByMasaAdi(masaAdi)!=null) {
+			masadb.deleteByMasaAdi(masaAdi);
+		}
+		masadb.save(new Masa(masaAdi, siparisdb.save(new Siparis(girisYapan.getId(), System.currentTimeMillis(), masaAdi)).getId()));
+		return ResponseEntity.status(HttpStatus.OK).body("İşlem tamamlandı! ");
+    }
+	@GetMapping("/urun")
+    @ResponseBody
+    public ResponseEntity<Urun> urun(@RequestParam(name = "sifreHashed")String sifreHashed
+    							, @RequestParam(name = "urunID")String urunID){
+		try {
+			sifreHashed = URLDecoder.decode(sifreHashed, "UTF-8");
+			urunID = URLDecoder.decode(urunID, "UTF-8");
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Urun(-1L));
+		}
+		
+		Personel girisYapan = personeldb.findByPersonelSifreHashed(sifreHashed);
+    	if(girisYapan==null) {
+    		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new Urun(-1L));
+    	}
+    	if(urundb.findById(Long.parseLong(urunID))==null) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Urun(-1L));
+		}
+    	return ResponseEntity.status(HttpStatus.OK).body(urundb.findById(Long.parseLong(urunID)).get());
+    }
+	@PostMapping("/siparisGuncelle")
+    @ResponseBody
+    public ResponseEntity<String> siparisGuncelle(@RequestParam(name = "sifreHashed")String sifreHashed
+    							, @RequestParam(name = "siparisID")String siparisID
+    							, @RequestParam(name = "urunID")String urunID
+    							, @RequestParam(name = "miktar")String miktar){
+		try {
+			sifreHashed = URLDecoder.decode(sifreHashed, "UTF-8");
+			siparisID = URLDecoder.decode(siparisID, "UTF-8");
+			urunID = URLDecoder.decode(urunID, "UTF-8");
+			miktar = URLDecoder.decode(miktar, "UTF-8");
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Parametreler hatalı! ");
+		}
+		Personel girisYapan = personeldb.findByPersonelSifreHashed(sifreHashed);
+    	if(girisYapan==null) {
+    		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Erişim izniniz yok! ");
+    	}
+		if(urundb.findById(Long.parseLong(urunID))==null) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Ürun bulunamadı! ");
+		}
+		if(siparisdb.findById(Long.parseLong(siparisID))==null) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Sipariş bulunamadı! ");
+		}
+		Siparis siparis = siparisdb.findById(Long.parseLong(siparisID)).get();
+		siparis.siparisGuncelle(Long.parseLong(urunID), urundb.findById(Long.parseLong(urunID)).get().getUrunFiyati(), Integer.parseInt(miktar));
+		siparisdb.save(siparis);
+		return ResponseEntity.status(HttpStatus.OK).body("İşlem tamamlandı! ");
     }
 }

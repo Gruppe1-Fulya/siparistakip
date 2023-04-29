@@ -33,7 +33,7 @@ public class Istek {
 		}
 		return istekJSONArray("bos", "GET");
 	}
-	public JSONObject urunEkle(String sifreHashed, String urunAdi, double urunFiyati, Long urunTuruID) {
+	public JSONObject urunEkle(String sifreHashed, String urunAdi, double urunFiyati, long urunTuruID) {
 		try {
 			return istekJSONObject("urunEkle?sifreHashed="+URLEncoder.encode(sifreHashed, "UTF-8")
 					+"&urunAdi="+URLEncoder.encode(urunAdi, "UTF-8")+"&urunFiyati="+URLEncoder.encode(""+urunFiyati, "UTF-8")
@@ -43,7 +43,7 @@ public class Istek {
 			e.printStackTrace();
 			
 		}
-		return istekJSONObject("bos", "GET", true);
+		return istekJSONObject("bos", "POST", true);
 	}
 	public JSONObject urunCikar(String sifreHashed, String urunID) {
 		try {
@@ -54,9 +54,9 @@ public class Istek {
 			e.printStackTrace();
 			
 		}
-		return istekJSONObject("bos", "GET", true);
+		return istekJSONObject("bos", "POST", true);
 	}
-	public JSONArray urunler(String sifreHashed, Long urunTuruID) {
+	public JSONArray urunler(String sifreHashed, long urunTuruID) {
 		try {
 			return istekJSONArray("urunler?sifreHashed="+URLEncoder.encode(sifreHashed, "UTF-8")
 					+"&urunTuruID="+URLEncoder.encode(""+urunTuruID, "UTF-8"), "GET");
@@ -65,6 +65,49 @@ public class Istek {
 			e.printStackTrace();
 		}
 		return istekJSONArray("bos", "GET");
+	}
+	public JSONObject masaSiparisi(String sifreHashed, String masaAdi) {
+		try {
+			return istekJSONObject("masaSiparisi?sifreHashed="+URLEncoder.encode(sifreHashed, "UTF-8")
+					+"&masaAdi="+URLEncoder.encode(masaAdi, "UTF-8"), "GET", false);
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+			
+		}
+		return istekJSONObject("bos", "GET", false);
+	}
+	public JSONObject masaGuncelle(String sifreHashed, String masaAdi) {
+		try {
+			return istekJSONObject("masaGuncelle?sifreHashed="+URLEncoder.encode(sifreHashed, "UTF-8")
+					+"&masaAdi="+URLEncoder.encode(masaAdi, "UTF-8"), "POST", true);
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+			
+		}
+		return istekJSONObject("bos", "POST", true);
+	}
+	public JSONObject urun(String sifreHashed, long urunID) {
+		try {
+			return istekJSONObject("urun?sifreHashed="+URLEncoder.encode(sifreHashed, "UTF-8")
+					+"&urunID="+URLEncoder.encode(""+urunID, "UTF-8"), "GET", false);
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+		return istekJSONObject("bos", "GET", false);
+	}
+	public JSONObject siparisGuncelle(String sifreHashed, long siparisID, long urunID, int miktar) {
+		try {
+			return istekJSONObject("siparisGuncelle?sifreHashed="+URLEncoder.encode(sifreHashed, "UTF-8")
+					+"&siparisID="+URLEncoder.encode(""+siparisID, "UTF-8")+"&urunID="+URLEncoder.encode(""+urunID, "UTF-8")
+					+"&miktar="+URLEncoder.encode(""+miktar, "UTF-8"), "POST", true);
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+		return istekJSONObject("bos", "POST", true);
 	}
 	public String hashSHA256(String girdi) {
 		HexFormat hf = HexFormat.of();

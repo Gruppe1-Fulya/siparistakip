@@ -416,12 +416,12 @@ public class Kontrolcu implements Initializable{
             				, odeme.getString("odemeYontemiAdi"), new Date(odeme.getLong("odemeZamani")), odeme.getString("personelAdi"), odeme.getString("odemeNotu")));
             		}
                     fistablo.setItems(girdiler);
-                	masalarpane.setVisible(false);
-                    menupane.setVisible(false);
-                	siparispane.setVisible(false);
-                	fislerpane.setVisible(true);
-                	odemepane.setVisible(false);
             	}
+            	masalarpane.setVisible(false);
+                menupane.setVisible(false);
+            	siparispane.setVisible(false);
+            	fislerpane.setVisible(true);
+            	odemepane.setVisible(false);
             }
         });
         masalarbtn.setOnAction(new EventHandler<ActionEvent>() {

@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import javamudavimleri.siparistakip.fx.net.Istek;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -405,7 +406,7 @@ public class Kontrolcu implements Initializable{
             public void handle(ActionEvent e) {
             	JSONArray odemeGecmisi = istek.odemeGecmisi(girisYapan.getString("personelSifreHashed"));
             	if(odemeGecmisi.getJSONObject(0).getInt("yanitKodu")==HttpStatus.OK.value()) {
-            		ObservableList<FisTablo> girdiler = fistablo.getItems();
+            		ObservableList<FisTablo> girdiler = FXCollections.observableArrayList();
             		for(int i = 0 ; i < odemeGecmisi.length() ; i++) {
             			JSONObject odeme = odemeGecmisi.getJSONObject(0);
             			double fisBahsis = odeme.getDouble("bahsis");

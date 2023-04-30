@@ -279,9 +279,9 @@ public class SpringController {
     	return ResponseEntity.status(HttpStatus.OK).body(siparisdb.findById(masadb.findByMasaAdi(masaAdi).getSiparisID()).get());
 		
     }
-	@PostMapping("/masaGuncelle")
+	@PostMapping("/masaAc")
     @ResponseBody
-    public ResponseEntity<String> masaGuncelle(@RequestParam(name = "sifreHashed")String sifreHashed
+    public ResponseEntity<String> masaAc(@RequestParam(name = "sifreHashed")String sifreHashed
     							, @RequestParam(name = "masaAdi")String masaAdi){
 		try {
 			sifreHashed = URLDecoder.decode(sifreHashed, "UTF-8");

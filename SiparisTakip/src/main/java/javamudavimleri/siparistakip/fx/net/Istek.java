@@ -77,9 +77,9 @@ public class Istek {
 		}
 		return istekJSONObject("bos", "GET", false);
 	}
-	public JSONObject masaGuncelle(String sifreHashed, String masaAdi) {
+	public JSONObject masaAc(String sifreHashed, String masaAdi) {
 		try {
-			return istekJSONObject("masaGuncelle?sifreHashed="+URLEncoder.encode(sifreHashed, "UTF-8")
+			return istekJSONObject("masaAc?sifreHashed="+URLEncoder.encode(sifreHashed, "UTF-8")
 					+"&masaAdi="+URLEncoder.encode(masaAdi, "UTF-8"), "POST", true);
 		}
 		catch(Exception e) {

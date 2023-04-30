@@ -199,7 +199,7 @@ public class Kontrolcu implements Initializable{
             	masaAdi += "-" + tiklananmasa.getId().substring(1);
             	JSONObject masaSiparisi = istek.masaSiparisi(girisYapan.getString("personelSifreHashed"), masaAdi);
             	if(masaSiparisi.getInt("yanitKodu")==HttpStatus.NOT_FOUND.value()) {
-            		if(istek.masaGuncelle(girisYapan.getString("personelSifreHashed"), masaAdi).getInt("yanitKodu")==HttpStatus.OK.value()) {
+            		if(istek.masaAc(girisYapan.getString("personelSifreHashed"), masaAdi).getInt("yanitKodu")==HttpStatus.OK.value()) {
             			masaSiparisi = istek.masaSiparisi(girisYapan.getString("personelSifreHashed"), masaAdi);
             		}
             	}

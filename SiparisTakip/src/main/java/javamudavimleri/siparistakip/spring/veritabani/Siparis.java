@@ -65,10 +65,12 @@ public class Siparis {
 			urunler = gecici.toString();
 		}
 	}
-	public void urunCikar(long urunID) {
+	public void urunCikar(long urunID, double urunFiyati) {
 		JSONObject gecici = new JSONObject(urunler);
 		try {
+			int urunAdet = gecici.getInt(""+urunID);
 			gecici.remove(""+urunID);
+			toplamTutar -= urunFiyati*urunAdet;
 		}
 		catch(Exception e) {
 			e.printStackTrace();

@@ -228,7 +228,7 @@ public class SpringController {
 		}
     	for(Masa masa: masadb.findAll()){
     		Siparis siparis = siparisdb.findById(masa.getSiparisID()).get();
-    		siparis.urunCikar(Long.parseLong(urunID));
+    		siparis.urunCikar(Long.parseLong(urunID), urundb.findById(Long.parseLong(urunID)).get().getUrunFiyati());
     		siparisdb.save(siparis);
     	}
     	urundb.deleteById(Long.parseLong(urunID));

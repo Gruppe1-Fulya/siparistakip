@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javamudavimleri.siparistakip.spring.veritabani.*;
+import javamudavimleri.siparistakip.spring.veritabani.db.*;
 
 @Controller
 public class SpringController {
@@ -323,7 +324,12 @@ public class SpringController {
     	if(masadb.findByMasaAdi(masaAdi)==null) {
     		return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Masa bulunamadı! ");
     	}
-		masadb.deleteByMasaAdi(masaAdi);
+    	try {
+    		masadb.deleteByMasaAdi(masaAdi);
+    	}
+    	catch(Exception e) {
+    		e.printStackTrace();
+    	}
 		return ResponseEntity.status(HttpStatus.OK).body("İşlem tamamlandı! ");
     }
 	@GetMapping("/urun")

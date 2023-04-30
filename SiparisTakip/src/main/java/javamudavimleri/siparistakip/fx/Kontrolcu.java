@@ -409,7 +409,7 @@ public class Kontrolcu implements Initializable{
             	if(odemeGecmisi.getJSONObject(0).getInt("yanitKodu")==HttpStatus.OK.value()) {
             		ObservableList<FisTablo> girdiler = FXCollections.observableArrayList();
             		for(int i = 0 ; i < odemeGecmisi.length() ; i++) {
-            			JSONObject odeme = odemeGecmisi.getJSONObject(0);
+            			JSONObject odeme = odemeGecmisi.getJSONObject(i);
             			double fisBahsis = odeme.getDouble("bahsis");
             			double fisToplam = odeme.getDouble("toplam");
             			girdiler.add(new FisTablo(odeme.getString("masaAdi"), odeme.getLong("id"), fisToplam-fisBahsis, fisBahsis, fisToplam

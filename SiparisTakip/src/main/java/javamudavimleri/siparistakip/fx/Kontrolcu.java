@@ -386,6 +386,7 @@ public class Kontrolcu implements Initializable{
             			menuecombo.getItems().add(urunTurleri.getJSONObject(i).getString("urunTuruAdi"));
             			urunTuruIsimleri.put(urunTurleri.getJSONObject(i).getString("urunTuruAdi"), urunTurleri.getJSONObject(i).getLong("id"));
             		}
+            		menukitemholder.getChildren().clear();
             		menukcombo.setOnAction(new EventHandler<ActionEvent>() {
     					@Override
     					public void handle(ActionEvent arg0) {

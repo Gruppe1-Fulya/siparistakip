@@ -27,8 +27,13 @@ public class Odeme {
 		this.siparisID = siparisID;
 		this.odemeYontemiID = odemeYontemiID;
 		this.personelID = personelID;
-		this.bahsis = bahsis;
-		this.toplam = araToplam + bahsis;
+		if(bahsis > 0) {
+			this.bahsis = bahsis;
+		}
+		else {
+			this.bahsis = 0;
+		}
+		this.toplam = araToplam + this.bahsis;
 		this.odemeNotu = odemeNotu;
 		this.odemeZamani = odemeZamani;
 	}

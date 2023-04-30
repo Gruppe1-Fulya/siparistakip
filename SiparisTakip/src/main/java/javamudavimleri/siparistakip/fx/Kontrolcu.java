@@ -42,8 +42,6 @@ public class Kontrolcu implements Initializable{
     @FXML
     Button fislerbtn;
     @FXML
-    Button sipariskaydetbtn;
-    @FXML
     Button odemebtn;
     @FXML
     Button odemetamamlabtn;
@@ -433,12 +431,6 @@ public class Kontrolcu implements Initializable{
             	odemepane.setVisible(false);
             }
         });
-        sipariskaydetbtn.setOnAction(new EventHandler<ActionEvent>() {
-            public void handle(ActionEvent e){
-            	masalarpane.setVisible(true);
-            	siparispane.setVisible(false);
-            }
-        });
         odemebtn.setOnAction(new EventHandler<ActionEvent>() {
             public void handle(ActionEvent e){
             	JSONObject masaSiparisi = istek.masaSiparisi(girisYapan.getString("personelSifreHashed"), masaAdi);
@@ -485,6 +477,9 @@ public class Kontrolcu implements Initializable{
     					public void changed(ObservableValue<? extends String> arg0, String eski, String yeni) {
     						try {
     							bahsis = Double.parseDouble(yeni);
+    							if(bahsis < 0) {
+    								bahsis = 0;
+    							}
     						}
     						catch(Exception e) {
     							e.printStackTrace();

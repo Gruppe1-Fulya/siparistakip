@@ -37,7 +37,7 @@ public class SpringController {
 	@Autowired
     private OdemeDB odemedb;
 	@PostMapping("/odemeYontemiEkle")
-    @ResponseBody 
+    @ResponseBody
     public ResponseEntity<String> odemeYontemiEkle(@RequestParam(name = "masterKey")String masterKey
     							, @RequestParam(name = "odemeYontemiAdi")String odemeYontemiAdi){
 		try {

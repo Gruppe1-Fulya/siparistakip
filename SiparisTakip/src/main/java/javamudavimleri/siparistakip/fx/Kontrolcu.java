@@ -507,7 +507,7 @@ public class Kontrolcu implements Initializable{
         });
 	}	
 	public void mkihguncelle(long urunTuruID) {
-		menukitemholder.getChildren().clear(); 
+		menukitemholder.getChildren().clear();
 		JSONArray urunler = istek.urunler(girisYapan.getString("personelSifreHashed")
 				, urunTuruID);
 		if(urunler.getJSONObject(0).getInt("yanitKodu")==HttpStatus.OK.value()) {

@@ -11,8 +11,6 @@ import java.net.URLEncoder;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestParam;
 
 public class Istek {
 	private String baseURL = "http://localhost:8080/";
@@ -82,6 +80,17 @@ public class Istek {
 	public JSONObject masaGuncelle(String sifreHashed, String masaAdi) {
 		try {
 			return istekJSONObject("masaGuncelle?sifreHashed="+URLEncoder.encode(sifreHashed, "UTF-8")
+					+"&masaAdi="+URLEncoder.encode(masaAdi, "UTF-8"), "POST", true);
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+			
+		}
+		return istekJSONObject("bos", "POST", true);
+	}
+	public JSONObject masaKapat(String sifreHashed, String masaAdi) {
+		try {
+			return istekJSONObject("masaKapat?sifreHashed="+URLEncoder.encode(sifreHashed, "UTF-8")
 					+"&masaAdi="+URLEncoder.encode(masaAdi, "UTF-8"), "POST", true);
 		}
 		catch(Exception e) {

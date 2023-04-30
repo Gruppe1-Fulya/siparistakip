@@ -300,6 +300,32 @@ public class SpringController {
 		masadb.save(new Masa(masaAdi, siparisdb.save(new Siparis(girisYapan.getId(), System.currentTimeMillis(), masaAdi)).getId()));
 		return ResponseEntity.status(HttpStatus.OK).body("İşlem tamamlandı! ");
     }
+	@PostMapping("/masaKapat")
+    @ResponseBody
+    public ResponseEntity<String> masaKapat(@RequestParam(name = "sifreHashed")String sifreHashed
+    							, @RequestParam(name = "masaAdi")String masaAdi){
+		try {
+			sifreHashed = URLDecoder.decode(sifreHashed, "UTF-8");
+			masaAdi = URLDecoder.decode(masaAdi, "UTF-8");
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Parametreler hatalı! ");
+		}
+		Personel girisYapan = personeldb.findByPersonelSifreHashed(sifreHashed);
+    	if(girisYapan==null) {
+    		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Erişim izniniz yok! ");
+    	}
+    	if(izinseviyedb.findById(girisYapan.getIzinSeviyeID()).get().getIzinSeviyesi() 
+    			< izinseviyedb.findByIzinSeviyeAdi("Kasiyer").getIzinSeviyesi()) {
+    		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Erişim izniniz yok! ");
+    	}
+    	if(masadb.findByMasaAdi(masaAdi)==null) {
+    		return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Masa bulunamadı! ");
+    	}
+		masadb.deleteByMasaAdi(masaAdi);
+		return ResponseEntity.status(HttpStatus.OK).body("İşlem tamamlandı! ");
+    }
 	@GetMapping("/urun")
     @ResponseBody
     public ResponseEntity<Urun> urun(@RequestParam(name = "sifreHashed")String sifreHashed

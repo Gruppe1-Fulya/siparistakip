@@ -502,6 +502,7 @@ public class Kontrolcu implements Initializable{
             	JSONObject odeme = istek.odeme(girisYapan.getString("personelSifreHashed"), masaSiparisID
             			, odemeYontemiIsimleri.get(odemeyontemicombo.getValue()), bahsis, odemenottxtf.getText());
             	if(odeme.getInt("yanitKodu")==HttpStatus.OK.value()) {
+            		istek.masaKapat(girisYapan.getString("personelSifreHashed"), masaAdi);
             		odemepane.setVisible(false);
                 	masalarpane.setVisible(true);
             	}

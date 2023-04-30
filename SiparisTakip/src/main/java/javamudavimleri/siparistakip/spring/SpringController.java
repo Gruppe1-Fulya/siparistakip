@@ -226,6 +226,11 @@ public class SpringController {
     	if(urundb.findById(Long.parseLong(urunID))==null) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Ürun bulunamadı! ");
 		}
+    	for(Masa masa: masadb.findAll()){
+    		Siparis siparis = siparisdb.findById(masa.getSiparisID()).get();
+    		siparis.urunCikar(Long.parseLong(urunID));
+    		siparisdb.save(siparis);
+    	}
     	urundb.deleteById(Long.parseLong(urunID));
     	return ResponseEntity.status(HttpStatus.OK).body("İşlem tamamlandı! ");
     }

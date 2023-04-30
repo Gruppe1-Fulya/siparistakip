@@ -65,6 +65,16 @@ public class Siparis {
 			urunler = gecici.toString();
 		}
 	}
+	public void urunCikar(long urunID) {
+		JSONObject gecici = new JSONObject(urunler);
+		try {
+			gecici.remove(""+urunID);
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+		urunler = gecici.toString();
+	}
 	public long getSiparisZamani() {
 		return siparisZamani;
 	}

@@ -507,10 +507,10 @@ public class Kontrolcu implements Initializable{
         });
 	}	
 	public void mkihguncelle(long urunTuruID) {
+		menukitemholder.getChildren().clear();
 		JSONArray urunler = istek.urunler(girisYapan.getString("personelSifreHashed")
 				, urunTuruID);
 		if(urunler.getJSONObject(0).getInt("yanitKodu")==HttpStatus.OK.value()) {
-			menukitemholder.getChildren().clear();
 			for(int i = 0 ; i < urunler.length() ; i++) {
 				menukitemholder.getChildren().add(le.menukitempane("menuk"+urunler.getJSONObject(i).getLong("id")
 				, urunler.getJSONObject(i).getString("urunAdi"), ""+urunler.getJSONObject(i).getDouble("urunFiyati"), menukdevent, menukcevent));
@@ -518,10 +518,10 @@ public class Kontrolcu implements Initializable{
 		}
 	}
 	public void skihguncelle(long urunTuruID) {
+		sipariskitemholder.getChildren().clear();
 		JSONArray urunler = istek.urunler(girisYapan.getString("personelSifreHashed")
 				, urunTuruID);
 		if(urunler.getJSONObject(0).getInt("yanitKodu")==HttpStatus.OK.value()) {
-			sipariskitemholder.getChildren().clear();
 			for(int i = 0 ; i < urunler.length() ; i++) {
 				sipariskitemholder.getChildren().add(le.sipariskitempane("siparisk"+urunler.getJSONObject(i).getLong("id")
 				, urunler.getJSONObject(i).getString("urunAdi"), ""+urunler.getJSONObject(i).getDouble("urunFiyati"), sipariskeevent));

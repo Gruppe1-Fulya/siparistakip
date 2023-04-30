@@ -392,7 +392,7 @@ public class SpringController {
     		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Erişim izniniz yok! ");
     	}
     	if(odemeyontemidb.findById(Long.parseLong(odemeYontemiID)).get()==null) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Ödeme yöntemi bulunamadı! ");
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Ödeme yöntemi bulunamadı! ");
 		}
 		if(siparisdb.findById(Long.parseLong(siparisID))==null) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Sipariş bulunamadı! ");

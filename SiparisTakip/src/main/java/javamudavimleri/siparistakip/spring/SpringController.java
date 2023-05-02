@@ -1,4 +1,6 @@
-package javamudavimleri.siparistakip.spring;
+//eski controller class'ı, herhangi bir sıkıntı yaşanırsa diye saklanıyor. 
+
+/*package javamudavimleri.siparistakip.spring;
 
 import java.net.URLDecoder;
 import java.util.ArrayList;
@@ -468,4 +470,4 @@ public class SpringController {
     	}
     	return ResponseEntity.status(HttpStatus.OK).body(odemeler.toString());
     }
-}
+}*/

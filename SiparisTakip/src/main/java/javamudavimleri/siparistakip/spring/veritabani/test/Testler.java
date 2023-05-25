@@ -45,8 +45,8 @@ public class Testler {
 	@Test
 	public void personelTest() {
 		String personelAdi = "PersonelTest";
-		String sifre = "1234";
-		long izinSeviyeID = 2L;
+		String sifre = "SifreTest";
+		long izinSeviyeID = 1L;
 		HexFormat hf = HexFormat.of();
 		String sifreHashed = "basarisiz";
 		try {
@@ -60,7 +60,7 @@ public class Testler {
 		}
 		else {
 			personeldb.save(new Personel(personelAdi, izinSeviyeID, sifreHashed));
-			assertEquals(personelAdi, personeldb.findByPersonelSifreHashed(sifreHashed).getPersonelAdi());
+			assertEquals(sifreHashed, personeldb.findByPersonelSifreHashed(sifreHashed).getPersonelSifreHashed());
 		}
 	}
 	
@@ -77,7 +77,7 @@ public class Testler {
 		double urunFiyati = 1.25;
 		long urunTuruID = 2L;
 		urundb.save(new Urun(urunAdi, urunFiyati, urunTuruID));
-		assertEquals(urunTuruID, urundb.findByUrunTuruID(urunTuruID).get(0).getUrunTuruID());
+		assertEquals(urunFiyati, urundb.findByUrunTuruID(urunTuruID).get(0).getUrunFiyati());
 	}
 	
 	@Test
@@ -86,7 +86,7 @@ public class Testler {
 		long siparisZamani = System.currentTimeMillis();
 		String masaAdi = "MasaTest";
 		siparisdb.save(new Siparis(personelID, siparisZamani, masaAdi));
-		assertEquals(1, siparisdb.count());
+		assertEquals(siparisZamani, siparisdb.findAll().get(0).getSiparisZamani());
 	}
 	
 	@Test
@@ -94,7 +94,7 @@ public class Testler {
 		String masaAdi = "MasaTest";
 		long siparisID = 163L;
 		masadb.save(new Masa(masaAdi, siparisID));
-		assertEquals(masaAdi, masadb.findByMasaAdi(masaAdi).getMasaAdi());
+		assertEquals(siparisID, masadb.findByMasaAdi(masaAdi).getSiparisID());
 	}
 	
 	@Test
@@ -114,7 +114,7 @@ public class Testler {
 		String odemeNotu = "OdemeNotuTest";
 		long odemeZamani = System.currentTimeMillis();
 		odemedb.save(new Odeme(siparisID, odemeYontemiID, personelID, bahsis, araToplam, odemeNotu, odemeZamani));
-		assertEquals(1, odemedb.count());
+		assertEquals(odemeNotu, odemedb.findAll().get(0).getOdemeNotu());
 	}
 	
 }
